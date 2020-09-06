@@ -24,6 +24,7 @@ import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.FundsExceededException;
+import org.knowm.xchange.interceptor.InterceptorProvider;
 import si.mazi.rescu.RestProxyFactory;
 import si.mazi.rescu.SynchronizedValueFactory;
 
@@ -50,12 +51,14 @@ public class BitstampAccountServiceRaw extends BitstampBaseService {
         RestProxyFactory.createProxy(
             BitstampAuthenticated.class,
             exchange.getExchangeSpecification().getSslUri(),
-            getClientConfig());
+            getClientConfig(),
+            InterceptorProvider.provide());
     this.bitstampAuthenticatedV2 =
         RestProxyFactory.createProxy(
             BitstampAuthenticatedV2.class,
             exchange.getExchangeSpecification().getSslUri(),
-            getClientConfig());
+            getClientConfig(),
+            InterceptorProvider.provide());
 
     this.apiKey = exchange.getExchangeSpecification().getApiKey();
     this.signatureCreator =
