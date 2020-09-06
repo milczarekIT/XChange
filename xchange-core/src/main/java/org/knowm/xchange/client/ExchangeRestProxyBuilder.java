@@ -1,8 +1,11 @@
 package org.knowm.xchange.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.knowm.xchange.ExchangeSpecification;
+import org.knowm.xchange.interceptor.InterceptorProvider;
 import si.mazi.rescu.ClientConfig;
 import si.mazi.rescu.Interceptor;
 import si.mazi.rescu.RestProxyFactory;
@@ -11,9 +14,9 @@ public final class ExchangeRestProxyBuilder<T> {
 
   private final Class<T> restInterface;
   private final ExchangeSpecification exchangeSpecification;
+  private final List<Interceptor> customInterceptors = new ArrayList<>();
   private ClientConfig clientConfig;
   private ResilienceRegistries resilienceRegistries;
-  private List<Interceptor> customInterceptors = new ArrayList<>();
 
   private ExchangeRestProxyBuilder(
       Class<T> restInterface, ExchangeSpecification exchangeSpecification) {
@@ -23,7 +26,8 @@ public final class ExchangeRestProxyBuilder<T> {
 
   public static <T> ExchangeRestProxyBuilder<T> forInterface(
       Class<T> restInterface, ExchangeSpecification exchangeSpecification) {
-    return new ExchangeRestProxyBuilder(restInterface, exchangeSpecification);
+    return new ExchangeRestProxyBuilder<>(restInterface, exchangeSpecification)
+        .customInterceptors(InterceptorProvider.provide());
   }
 
   public ExchangeRestProxyBuilder<T> clientConfig(ClientConfig value) {
@@ -33,6 +37,18 @@ public final class ExchangeRestProxyBuilder<T> {
 
   public ExchangeRestProxyBuilder<T> customInterceptor(Interceptor value) {
     customInterceptors.add(value);
+    return this;
+  }
+
+  public ExchangeRestProxyBuilder<T> customInterceptors(Interceptor... interceptors) {
+    if (interceptors != null) {
+      customInterceptors(Arrays.asList(interceptors));
+    }
+    return this;
+  }
+
+  public ExchangeRestProxyBuilder<T> customInterceptors(Collection<Interceptor> interceptors) {
+    customInterceptors.addAll(interceptors);
     return this;
   }
 
