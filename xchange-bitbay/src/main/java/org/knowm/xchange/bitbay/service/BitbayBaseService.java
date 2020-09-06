@@ -6,6 +6,7 @@ import org.knowm.xchange.bitbay.BitbayAuthenticated;
 import org.knowm.xchange.bitbay.BitbayDigest;
 import org.knowm.xchange.bitbay.dto.BitbayBaseResponse;
 import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.interceptor.InterceptorProvider;
 import org.knowm.xchange.service.BaseExchangeService;
 import org.knowm.xchange.service.BaseService;
 import si.mazi.rescu.ParamsDigest;
@@ -27,12 +28,16 @@ public class BitbayBaseService extends BaseExchangeService implements BaseServic
 
     bitbay =
         RestProxyFactory.createProxy(
-            Bitbay.class, exchange.getExchangeSpecification().getSslUri(), getClientConfig());
+            Bitbay.class,
+            exchange.getExchangeSpecification().getSslUri(),
+            getClientConfig(),
+            InterceptorProvider.provide());
     bitbayAuthenticated =
         RestProxyFactory.createProxy(
             BitbayAuthenticated.class,
             exchange.getExchangeSpecification().getSslUri(),
-            getClientConfig());
+            getClientConfig(),
+            InterceptorProvider.provide());
     sign = BitbayDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
     apiKey = exchange.getExchangeSpecification().getApiKey();
   }
