@@ -7,6 +7,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.FundsExceededException;
 import org.knowm.xchange.exceptions.InternalServerException;
 import org.knowm.xchange.exceptions.RateLimitExceededException;
+import org.knowm.xchange.interceptor.InterceptorProvider;
 import org.knowm.xchange.service.BaseExchangeService;
 import org.knowm.xchange.service.BaseService;
 import si.mazi.rescu.ParamsDigest;
@@ -25,7 +26,10 @@ public class CoinbaseProBaseService extends BaseExchangeService implements BaseS
     super(exchange);
     coinbasePro =
         RestProxyFactory.createProxy(
-            CoinbasePro.class, exchange.getExchangeSpecification().getSslUri(), getClientConfig());
+            CoinbasePro.class,
+            exchange.getExchangeSpecification().getSslUri(),
+            getClientConfig(),
+            InterceptorProvider.provide());
     digest = CoinbaseProDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
     apiKey = exchange.getExchangeSpecification().getApiKey();
     passphrase =
