@@ -24,7 +24,16 @@ import org.knowm.xchange.dto.trade.OpenOrders;
 import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.service.trade.TradeService;
-import org.knowm.xchange.service.trade.params.*;
+import org.knowm.xchange.service.trade.params.CancelAllOrders;
+import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
+import org.knowm.xchange.service.trade.params.CancelOrderParams;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrencyPair;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamOffset;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamPaging;
+import org.knowm.xchange.service.trade.params.TradeHistoryParams;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamsIdSpan;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamsSorted;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamsTimeSpan;
 import org.knowm.xchange.service.trade.params.orders.DefaultOpenOrdersParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.utils.DateUtils;
@@ -146,14 +155,22 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
               .map(Long::parseLong)
               .orElse(null);
     }
-    BitstampUserTransaction[] txs =
-        getBitstampUserTransactions(
-            limit,
-            currencyPair,
-            offset,
-            sort == null ? null : sort.toString(),
-            sinceTimestamp,
-            sinceId);
+    BitstampUserTransaction[] txs;
+    if (currencyPair == null) {
+      txs =
+          getBitstampUserTransactions(
+              limit, offset, sort == null ? null : sort.toString(), sinceTimestamp, sinceId);
+    } else {
+      txs =
+          getBitstampUserTransactions(
+              limit,
+              currencyPair,
+              offset,
+              sort == null ? null : sort.toString(),
+              sinceTimestamp,
+              sinceId);
+    }
+
     return BitstampAdapters.adaptTradeHistory(txs);
   }
 
