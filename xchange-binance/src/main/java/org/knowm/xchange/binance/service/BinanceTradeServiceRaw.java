@@ -199,7 +199,7 @@ public class BinanceTradeServiceRaw extends BinanceBaseService {
                     apiKey,
                     signatureCreator))
         .withRetry(retry("myTrades"))
-        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER), myTradesPermits(limit))
+        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER), 5)
         .call();
   }
 
@@ -225,10 +225,4 @@ public class BinanceTradeServiceRaw extends BinanceBaseService {
     return pair != null ? 1 : 40;
   }
 
-  protected int myTradesPermits(Integer limit) {
-    if (limit != null && limit > 500) {
-      return 10;
-    }
-    return 5;
-  }
 }
