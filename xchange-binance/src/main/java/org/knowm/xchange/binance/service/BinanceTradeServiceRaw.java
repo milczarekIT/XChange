@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import lombok.extern.slf4j.Slf4j;
 import org.knowm.xchange.binance.BinanceAdapters;
 import org.knowm.xchange.binance.BinanceAuthenticated;
 import org.knowm.xchange.binance.BinanceExchange;
@@ -22,6 +25,7 @@ import org.knowm.xchange.binance.dto.trade.TimeInForce;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 
+@Slf4j
 public class BinanceTradeServiceRaw extends BinanceBaseService {
 
   protected BinanceTradeServiceRaw(
@@ -186,6 +190,13 @@ public class BinanceTradeServiceRaw extends BinanceBaseService {
   public List<BinanceTrade> myTrades(
       CurrencyPair pair, Integer limit, Long startTime, Long endTime, Long fromId)
       throws BinanceException, IOException {
+    final RateLimiter rateLimiter = rateLimiter(REQUEST_WEIGHT_RATE_LIMITER);
+    final RateLimiter.Metrics metrics = rateLimiter.getMetrics();
+    log.debug("Rate limiter: {}, availablePermissions: {}, numberOfWaitingThreads: {}, config: {}",
+            rateLimiter.getName(),
+            metrics.getAvailablePermissions(),
+            metrics.getNumberOfWaitingThreads(),
+            rateLimiter.getRateLimiterConfig());
     return decorateApiCall(
             () ->
                 binance.myTrades(
@@ -199,7 +210,7 @@ public class BinanceTradeServiceRaw extends BinanceBaseService {
                     apiKey,
                     signatureCreator))
         .withRetry(retry("myTrades"))
-        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER), 5)
+        .withRateLimiter(rateLimiter, 5)
         .call();
   }
 
