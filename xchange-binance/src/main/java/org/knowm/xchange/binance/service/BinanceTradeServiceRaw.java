@@ -210,7 +210,7 @@ public class BinanceTradeServiceRaw extends BinanceBaseService {
                     apiKey,
                     signatureCreator))
         .withRetry(retry("myTrades"))
-        .withRateLimiter(rateLimiter, 5)
+        .withRateLimiter(rateLimiter, 10)
         .call();
   }
 

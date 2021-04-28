@@ -46,7 +46,7 @@ public class BinanceBaseService extends BaseResilientExchangeService<BinanceExch
   public BinanceExchangeInfo getExchangeInfo() throws IOException {
     return decorateApiCall(binance::exchangeInfo)
         .withRetry(retry("exchangeInfo"))
-        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
+        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER), 10)
         .call();
   }
 
